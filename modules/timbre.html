@@ -97,18 +97,12 @@
     }
     .out-of-et { color:#f59e0b;font-weight:600; }
 
-    /* Bravura — open-source SMuFL music font.
-       When loaded, its Unicode Musical Symbol glyphs (U+1D11E treble, U+1D122 bass)
-       are anchored at the bottom of the respective staff, giving clean macOS-style rendering.
-       Multiple CDN sources are listed so at least one resolves. If none load the browser
-       falls back to Apple Symbols / system serif, which also contains these code points. */
-    @font-face {
-      font-family: 'Bravura';
-      src: url('https://cdn.jsdelivr.net/gh/steinbergmedia/bravura@main/redist/woff2/Bravura.woff2') format('woff2'),
-           url('https://cdn.jsdelivr.net/gh/steinbergmedia/bravura@master/redist/woff2/Bravura.woff2') format('woff2'),
-           url('https://cdn.jsdelivr.net/gh/steinbergmedia/bravura/redist/woff2/Bravura.woff2') format('woff2');
-      font-display: swap;
-    }
+    /* Clef glyphs use system music fonts only — no web font loaded.
+       Bravura was removed because its async load (font-display:swap) caused
+       a jarring layout shift: the page renders with Apple Symbols metrics,
+       then Bravura swaps in with different glyph dimensions.
+       Apple Symbols (macOS) and Segoe UI Symbol (Windows) both contain
+       U+1D11E (𝄞) and U+1D122 (𝄢) — no web font needed. */
   </style>
 </head>
 <body>
@@ -475,10 +469,10 @@ function buildStaff(fundamentalKey) {
   //   Bass   (font-size=72):  F-dots ~34px above baseline → baseline = F3(292)+34 = 326
   // 𝄞 = U+1D11E treble clef
   txt('𝄞', {x:staffX1+4, y:248, 'font-size':'130',
-    'font-family':'Bravura,Apple Symbols,serif', fill:'var(--text)'});
+    'font-family':'Apple Symbols,Segoe UI Symbol,serif', fill:'var(--text)'});
   // 𝄢 = U+1D122 bass clef
   txt('𝄢', {x:staffX1+4, y:326, 'font-size':'72',
-    'font-family':'Bravura,Apple Symbols,serif', fill:'var(--text)'});
+    'font-family':'Apple Symbols,Segoe UI Symbol,serif', fill:'var(--text)'});
 
   // Grand staff: thick bracket bar + piano curly brace
   const by1 = TREBLE_LINES[4] - 8;   // top of system  (y=172)
