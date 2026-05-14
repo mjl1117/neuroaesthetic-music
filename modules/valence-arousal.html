@@ -53,8 +53,11 @@
     .legend { display:flex;gap:1.25rem;flex-wrap:wrap;margin:1.25rem 0 .5rem;align-items:center; }
     .legend-item { display:flex;align-items:center;gap:.5rem;font-size:.82rem;font-weight:500;color:var(--text-2); }
     .legend-dot { width:12px;height:12px;border-radius:50%;flex-shrink:0; }
-    .legend-dot.reported { background:#8b5cf6; }
-    .legend-dot.predicted { background:transparent;border:2.5px solid #8b5cf6; }
+    .legend-dot.reported  { background:#64748b; }
+    .legend-dot.predicted { background:transparent;border:2.5px dashed #64748b; }
+    .color-legend { display:flex;gap:.9rem;flex-wrap:wrap;margin:.6rem 0 0;align-items:center; }
+    .color-legend-item { display:flex;align-items:center;gap:.4rem;font-size:.76rem;color:var(--text-2); }
+    .color-swatch { width:11px;height:11px;border-radius:50%;flex-shrink:0; }
     .toggle-row { display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap; }
     .view-btn {
       padding:.35rem .9rem;border-radius:999px;border:1.5px solid var(--border);
@@ -84,6 +87,14 @@
     <div class="legend">
       <div class="legend-item"><div class="legend-dot reported"></div> Human reported</div>
       <div class="legend-item"><div class="legend-dot predicted"></div> Model predicted</div>
+    </div>
+    <div class="color-legend">
+      <span style="font-size:.72rem;font-weight:600;color:var(--text-2);margin-right:.2rem;">Color = designed quadrant:</span>
+      <div class="color-legend-item"><div class="color-swatch" style="background:#fca5a5"></div>Tense / Anxious</div>
+      <div class="color-legend-item"><div class="color-swatch" style="background:#86efac"></div>Excited / Joyful</div>
+      <div class="color-legend-item"><div class="color-swatch" style="background:#93c5fd"></div>Calm / Serene</div>
+      <div class="color-legend-item"><div class="color-swatch" style="background:#cbd5e1"></div>Sad / Gloomy</div>
+      <div class="color-legend-item"><div class="color-swatch" style="background:#fcd34d"></div>Transitional</div>
     </div>
     <p class="click-hint">Click any dot to open the YouTube clip</p>
     <svg id="circumplex" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
@@ -287,17 +298,19 @@
 // pred = Random Forest in-sample prediction (R²=0.945 valence / R²=0.944 arousal, 68 features)
 // rep = participant-reported V/A from the listening study (feat_df.parquet, normalised 0-100 → -1..1)
 // pred = Random Forest model prediction (R²=0.945 valence, R²=0.944 arousal, in-sample, 68 features)
+// color = designed emotional quadrant (composer's intent at time of selection)
+// quadrant = human-readable label for tooltip
 const PIECES = [
-  { name:"Schnittke, Concerto Grosso I",           rep:{v:-.39,a:+.64}, pred:{v:-.28,a:+.53}, color:"#fca5a5", videoId:"fTTyS6mjZiI", start:315  },
-  { name:"Satoh, The Heavenly Spheres",            rep:{v:+.70,a:-.67}, pred:{v:+.61,a:-.59}, color:"#6ee7b7", videoId:"DM7C57d0D6I", start:352  },
-  { name:"Saariaho, Laterna Magica",               rep:{v:-.40,a:+.18}, pred:{v:-.29,a:+.15}, color:"#93c5fd", videoId:"wZC5cvfn8iw", start:1040 },
-  { name:"Adams, Harmonielehre III",               rep:{v:+.44,a:+.60}, pred:{v:+.35,a:+.52}, color:"#a5b4fc", videoId:"peuuOYs5o38", start:420  },
-  { name:"Grisey, Vortex Temporum I",              rep:{v:-.62,a:+.50}, pred:{v:-.40,a:+.45}, color:"#fca5a5", videoId:"jOpRaC8lGDw", start:145  },
-  { name:"Norman, Companion Guide IX",             rep:{v:+.82,a:+.80}, pred:{v:+.66,a:+.68}, color:"#a5b4fc", videoId:"aC5C--GYmSI", start:1579 },
-  { name:"Macklay, Many Many Cadences",            rep:{v:-.26,a:+.53}, pred:{v:-.20,a:+.49}, color:"#a5b4fc", videoId:"QsFWaY6N4ao", start:3    },
-  { name:"Soper, Voices from the Killing Jar III", rep:{v:+.35,a:+.34}, pred:{v:+.25,a:+.23}, color:"#93c5fd", videoId:"nnxsRegaZ60", start:626  },
-  { name:"Abrahamsen, Let Me Tell You I",          rep:{v:+.42,a:-.14}, pred:{v:+.35,a:-.06}, color:"#6ee7b7", videoId:"c6Eow6y3QJ4", start:1042 },
-  { name:"Weinberg, Table Talk",                   rep:{v:-.23,a:+.39}, pred:{v:-.15,a:+.32}, color:"#fca5a5", videoId:"ttF4dWnuhdM", start:33   },
+  { name:"Schnittke, Concerto Grosso I",           rep:{v:-.39,a:+.64}, pred:{v:-.28,a:+.53}, color:"#fca5a5", quadrant:"Tense / Anxious",   videoId:"fTTyS6mjZiI", start:315  },
+  { name:"Satoh, The Heavenly Spheres",            rep:{v:+.70,a:-.67}, pred:{v:+.61,a:-.59}, color:"#93c5fd", quadrant:"Calm / Serene",     videoId:"DM7C57d0D6I", start:352  },
+  { name:"Saariaho, Laterna Magica",               rep:{v:-.40,a:+.18}, pred:{v:-.29,a:+.15}, color:"#cbd5e1", quadrant:"Sad / Gloomy",      videoId:"wZC5cvfn8iw", start:1040 },
+  { name:"Adams, Harmonielehre III",               rep:{v:+.44,a:+.60}, pred:{v:+.35,a:+.52}, color:"#86efac", quadrant:"Excited / Joyful",  videoId:"peuuOYs5o38", start:420  },
+  { name:"Grisey, Vortex Temporum I",              rep:{v:-.62,a:+.50}, pred:{v:-.40,a:+.45}, color:"#fca5a5", quadrant:"Tense / Anxious",   videoId:"jOpRaC8lGDw", start:145  },
+  { name:"Norman, Companion Guide IX",             rep:{v:+.82,a:+.80}, pred:{v:+.66,a:+.68}, color:"#86efac", quadrant:"Excited / Joyful",  videoId:"aC5C--GYmSI", start:1579 },
+  { name:"Macklay, Many Many Cadences",            rep:{v:-.26,a:+.53}, pred:{v:-.20,a:+.49}, color:"#86efac", quadrant:"Excited / Joyful",  videoId:"QsFWaY6N4ao", start:3    },
+  { name:"Soper, Voices from the Killing Jar III", rep:{v:+.35,a:+.34}, pred:{v:+.25,a:+.23}, color:"#cbd5e1", quadrant:"Sad / Gloomy",      videoId:"nnxsRegaZ60", start:626  },
+  { name:"Abrahamsen, Let Me Tell You I",          rep:{v:+.42,a:-.14}, pred:{v:+.35,a:-.06}, color:"#93c5fd", quadrant:"Calm / Serene",     videoId:"c6Eow6y3QJ4", start:1042 },
+  { name:"Weinberg, Table Talk",                   rep:{v:-.23,a:+.39}, pred:{v:-.15,a:+.32}, color:"#fcd34d", quadrant:"Transitional",      videoId:"ttF4dWnuhdM", start:33   },
 ];
 
 const dotsG   = document.getElementById('dots');
@@ -330,13 +343,14 @@ function buildDots() {
     function makeDot(cx, cy, filled, label) {
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       g.style.cursor = 'pointer';
+      // Predicted outline: use a slightly darkened version of the piece color for contrast
       g.innerHTML = filled
         ? `<circle cx="${cx}" cy="${cy}" r="7" fill="${p.color}" stroke="#fff" stroke-width="2"/>
            <text x="${cx}" y="${cy-11}" font-size="10" fill="${p.color}" font-family="Inter,sans-serif" text-anchor="middle" font-weight="600">${i+1}</text>`
-        : `<circle cx="${cx}" cy="${cy}" r="7" fill="#fff" stroke="${p.color}" stroke-width="2.5" stroke-dasharray="3 2"/>
+        : `<circle cx="${cx}" cy="${cy}" r="7" fill="rgba(255,255,255,0.7)" stroke="${p.color}" stroke-width="2.5" stroke-dasharray="3 2"/>
            <text x="${cx}" y="${cy-11}" font-size="10" fill="${p.color}" font-family="Inter,sans-serif" text-anchor="middle" font-weight="600">${i+1}</text>`;
       g.addEventListener('mouseenter', () => {
-        tooltip.innerHTML = `<strong>${i+1}. ${p.name}</strong><br>${label}`;
+        tooltip.innerHTML = `<strong>${i+1}. ${p.name}</strong><br><span style="font-size:.8em;opacity:.8;">${p.quadrant}</span><br>${label}`;
         tooltip.style.opacity = '1';
       });
       g.addEventListener('mousemove', e => {
