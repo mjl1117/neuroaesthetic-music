@@ -96,6 +96,15 @@
       font-size:.8rem;color:var(--text-2);margin-top:.75rem;line-height:1.6;
     }
     .out-of-et { color:#f59e0b;font-weight:600; }
+
+    /* Bravura — SMuFL standard music font.
+       Each glyph has its anchor at its defining pitch line (G for treble, F for bass),
+       so setting SVG text y = that line's pixel position gives exact placement. */
+    @font-face {
+      font-family: 'Bravura';
+      src: url('https://cdn.jsdelivr.net/gh/steinbergmedia/bravura/redist/woff2/Bravura.woff2') format('woff2');
+      font-display: swap;
+    }
   </style>
 </head>
 <body>
@@ -454,20 +463,16 @@ function buildStaff(fundamentalKey) {
       stroke:'var(--border)', 'stroke-width':'1.5'});
   });
 
-  // Clef symbols.
-  // Bass clef 𝄢: the two dots must bracket the F line (4th from bottom = BASS_LINES[1]=292).
-  //   In most system fonts the visual midpoint of 𝄢 sits ~55% up from the baseline,
-  //   so shift the baseline down by that fraction of the character height (font-size 30 ≈ 30px).
-  //   baseline = F_line + 0.45 * 30 ≈ 306
-  txt('𝄢', {x:staffX1+4, y:BASS_LINES[1]+14, 'font-size':'30', fill:'var(--text-2)',
-    'dominant-baseline':'auto'});
-
-  // Treble clef 𝄞: the curl must wrap the G line (2nd from bottom = TREBLE_LINES[1]=228).
-  //   𝄞 is very tall; in most system fonts the G-curl sits ~70% up from the baseline.
-  //   font-size 46, character height ≈ 138px → G-line offset = 0.70*138 = 97
-  //   baseline = G_line + 97 = 325. The clef then spans ~228-41=187 to 325, covering the staff.
-  txt('𝄞', {x:staffX1+4, y:TREBLE_LINES[1]+97, 'font-size':'46', fill:'var(--text-2)',
-    'dominant-baseline':'auto'});
+  // Clef symbols — rendered with Bravura (SMuFL standard music font).
+  // In SMuFL, 1em = 4 staff spaces = 4 × 16px = 64px in this layout.
+  // SMuFL anchor points: gClef (U+E050) origin = G line; fClef (U+E062) origin = F line.
+  // Setting y to those exact pixel positions gives perfect placement.
+  // TREBLE_LINES[1] = 228 = G4 (2nd line from bottom of treble staff).
+  // BASS_LINES[1]   = 292 = F3 (4th line from bottom of bass staff).
+  txt('', {x:staffX1+6, y:TREBLE_LINES[1], 'font-size':'64',
+    'font-family':'Bravura,serif', fill:'var(--text)', 'dominant-baseline':'auto'});
+  txt('', {x:staffX1+6, y:BASS_LINES[1], 'font-size':'64',
+    'font-family':'Bravura,serif', fill:'var(--text)', 'dominant-baseline':'auto'});
 
   // Grand staff bracket
   el('line', {x1:staffX1-2,y1:TREBLE_LINES[4]-8,x2:staffX1-2,y2:BASS_LINES[0]+6,
@@ -519,12 +524,21 @@ function buildStaff(fundamentalKey) {
       'aria-label': `Partial ${n}: ${name}${octave} ${freq.toFixed(0)} Hz`
     });
 
-    // Accidental to the left of the notehead (♯ or ♭ when the pitch has one)
+    // Accidental to the left of the notehead (♯ or ♭).
+    // font-size=17 makes the main body of the accidental roughly the same height as the
+    // notehead (ry=5.5, total ~11px). Positioned with text-anchor='middle' so the
+    // horizontal center of the glyph is 16px to the left of the notehead center.
+    //
+    // Vertical alignment: dominant-baseline='middle' centers the glyph bounding box.
+    // For ♯ the two horizontal lines sit at the bounding-box middle → y = cy.
+    // For ♭ the white oval is ~25% below the bounding-box middle → shift y down 5px
+    //   so the oval (the "white part") lands at cy.
     const accSym = name.includes('♯') ? '♯' : name.includes('♭') ? '♭' : null;
     if (accSym) {
       txt(accSym, {
-        x: x - 11, y: cy + 4,
-        'font-size': '11',
+        x: x - 16,
+        y: accSym === '♭' ? cy + 5 : cy,
+        'font-size': '17',
         fill: isOOT ? '#f59e0b' : 'var(--indigo)',
         'text-anchor': 'middle',
         'dominant-baseline': 'middle'
