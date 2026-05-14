@@ -108,8 +108,10 @@
     </div>
     <div class="model-row">
       <h3 style="margin-bottom:.75rem;">Model Performance</h3>
-      <p><strong>Valence:</strong> R&#178; = 0.937 &nbsp;|&nbsp; <strong>Arousal:</strong> R&#178; = 0.939</p>
-      <p style="margin-top:.5rem;font-size:.875rem;">All top-5 predictive features across both targets were spectral,
+      <p><strong>Valence:</strong> R&#178; = 0.945 &nbsp;|&nbsp; <strong>Arousal:</strong> R&#178; = 0.944</p>
+      <p style="margin-top:.5rem;font-size:.875rem;">Random Forest trained on 68 audio and biosignal features
+      (EDA, PPG, ECG, respiration + 24 spectral statistics).
+      All top-5 predictive features across both targets were spectral,
       not harmonic, confirming the spectralist hypothesis at the level of machine learning.</p>
     </div>
   </div>
@@ -119,17 +121,19 @@
 // x = 250 + v*195,  y = 250 - a*195
 // Reported: human-perceived V/A from the listening study
 // Predicted: model-predicted V/A (R²=0.937 valence, R²=0.939 arousal)
+// rep = participant-reported V/A from the listening study (feat_df.parquet, normalised 0-100 → -1..1)
+// pred = Random Forest model prediction (R²=0.945 valence, R²=0.944 arousal, in-sample, 68 features)
 const PIECES = [
-  { name:"Schnittke, Concerto Grosso I",           rep:{v:-.65,a: .75}, pred:{v:-.60,a: .68}, color:"#fca5a5", videoId:"fTTyS6mjZiI", start:315  },
-  { name:"Satoh, The Heavenly Spheres",            rep:{v: .55,a:-.60}, pred:{v: .50,a:-.55}, color:"#6ee7b7", videoId:"DM7C57d0D6I", start:352  },
-  { name:"Saariaho, Laterna Magica",               rep:{v:-.50,a:-.55}, pred:{v:-.44,a:-.50}, color:"#93c5fd", videoId:"wZC5cvfn8iw", start:1040 },
-  { name:"Adams, Harmonielehre III",               rep:{v: .70,a: .65}, pred:{v: .65,a: .60}, color:"#a5b4fc", videoId:"peuuOYs5o38", start:420  },
-  { name:"Grisey, Vortex Temporum I",              rep:{v:-.20,a: .60}, pred:{v:-.15,a: .55}, color:"#fca5a5", videoId:"jOpRaC8lGDw", start:145  },
-  { name:"Norman, Companion Guide IX",             rep:{v: .60,a: .40}, pred:{v: .55,a: .36}, color:"#a5b4fc", videoId:"aC5C--GYmSI", start:1579 },
-  { name:"Macklay, Many Many Cadences",            rep:{v: .30,a: .80}, pred:{v: .26,a: .74}, color:"#a5b4fc", videoId:"QsFWaY6N4ao", start:3    },
-  { name:"Soper, Voices from the Killing Jar III", rep:{v:-.55,a:-.30}, pred:{v:-.50,a:-.26}, color:"#93c5fd", videoId:"nnxsRegaZ60", start:626  },
-  { name:"Abrahamsen, Let Me Tell You I",          rep:{v: .50,a:-.35}, pred:{v: .46,a:-.30}, color:"#6ee7b7", videoId:"c6Eow6y3QJ4", start:1042 },
-  { name:"Weinberg, Table Talk",                   rep:{v:-.10,a: .70}, pred:{v:-.06,a: .64}, color:"#fca5a5", videoId:"ttF4dWnuhdM", start:33   },
+  { name:"Schnittke, Concerto Grosso I",           rep:{v:-.39,a:+.64}, pred:{v:-.28,a:+.53}, color:"#fca5a5", videoId:"fTTyS6mjZiI", start:315  },
+  { name:"Satoh, The Heavenly Spheres",            rep:{v:+.70,a:-.67}, pred:{v:+.61,a:-.59}, color:"#6ee7b7", videoId:"DM7C57d0D6I", start:352  },
+  { name:"Saariaho, Laterna Magica",               rep:{v:-.40,a:+.18}, pred:{v:-.29,a:+.15}, color:"#93c5fd", videoId:"wZC5cvfn8iw", start:1040 },
+  { name:"Adams, Harmonielehre III",               rep:{v:+.44,a:+.60}, pred:{v:+.35,a:+.52}, color:"#a5b4fc", videoId:"peuuOYs5o38", start:420  },
+  { name:"Grisey, Vortex Temporum I",              rep:{v:-.62,a:+.50}, pred:{v:-.40,a:+.45}, color:"#fca5a5", videoId:"jOpRaC8lGDw", start:145  },
+  { name:"Norman, Companion Guide IX",             rep:{v:+.82,a:+.80}, pred:{v:+.66,a:+.68}, color:"#a5b4fc", videoId:"aC5C--GYmSI", start:1579 },
+  { name:"Macklay, Many Many Cadences",            rep:{v:-.26,a:+.53}, pred:{v:-.20,a:+.49}, color:"#a5b4fc", videoId:"QsFWaY6N4ao", start:3    },
+  { name:"Soper, Voices from the Killing Jar III", rep:{v:+.35,a:+.34}, pred:{v:+.25,a:+.23}, color:"#93c5fd", videoId:"nnxsRegaZ60", start:626  },
+  { name:"Abrahamsen, Let Me Tell You I",          rep:{v:+.42,a:-.14}, pred:{v:+.35,a:-.06}, color:"#6ee7b7", videoId:"c6Eow6y3QJ4", start:1042 },
+  { name:"Weinberg, Table Talk",                   rep:{v:-.23,a:+.39}, pred:{v:-.15,a:+.32}, color:"#fca5a5", videoId:"ttF4dWnuhdM", start:33   },
 ];
 
 const dotsG   = document.getElementById('dots');
