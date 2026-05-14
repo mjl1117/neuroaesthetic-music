@@ -432,7 +432,7 @@ function noteY(name, octave) {
 const BASS_LINES   = [340, 324, 308, 292, 276];
 // Treble clef lines: E4 G4 B4 D5 F5
 const TREBLE_LINES = [244, 228, 212, 196, 180];
-const LEFT_MARGIN = 60;
+const LEFT_MARGIN = 90;
 const COL_W = 70;  // horizontal spacing per partial
 const N_PARTIALS = 16;
 
@@ -469,13 +469,14 @@ function buildStaff(fundamentalKey) {
 
   // Clef symbols — standard Unicode Musical Symbols (U+1D11E treble, U+1D122 bass).
   // These are present in Apple Symbols (macOS), Segoe UI Symbol (Windows), and Bravura.
-  // y positions tuned for Apple Symbols on macOS: baseline just below E4 (treble, y=252)
-  // and just below D3 (bass, y=322) so the G-curl and F-dots land on the correct lines.
-  // 𝄞 = U+1D11E treble clef (standard Unicode, present in Apple Symbols + Bravura)
-  txt('𝄞', {x:staffX1+6, y:252, 'font-size':'48',
+  // y = SVG baseline. Apple Symbols font metrics (empirically tuned):
+  //   Treble (font-size=56): G-curl appears ~19px above baseline → baseline = G4(228)+19 = 247
+  //   Bass   (font-size=36): F-dots appear ~17px above baseline → baseline = F3(292)+17 = 309
+  // 𝄞 = U+1D11E treble clef
+  txt('𝄞', {x:staffX1+6, y:247, 'font-size':'56',
     'font-family':'Bravura,Apple Symbols,serif', fill:'var(--text)'});
   // 𝄢 = U+1D122 bass clef
-  txt('𝄢', {x:staffX1+6, y:322, 'font-size':'30',
+  txt('𝄢', {x:staffX1+6, y:309, 'font-size':'36',
     'font-family':'Bravura,Apple Symbols,serif', fill:'var(--text)'});
 
   // Grand staff bracket
