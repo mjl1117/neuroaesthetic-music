@@ -478,26 +478,33 @@ function buildStaff(fundamentalKey) {
   const by1 = TREBLE_LINES[4] - 8;   // top of system  (y=172)
   const by2 = BASS_LINES[0]  + 6;    // bottom of system (y=346)
   const mid = (by1 + by2) / 2;       // midpoint       (y=259)
-  const brx  = staffX1 - 14;         // right edge of brace
-  const tipX = brx - 28;             // tip extends 28px left — matches reference width
-  const H2   = (by2 - by1) / 2;      // half-height ≈ 87px
-  const sh   = H2 * 0.17;            // terminal scroll height ≈ 15px
+  const brx   = staffX1 - 14;        // right edge of brace
+  const H2    = (by2 - by1) / 2;     // half-height ≈ 87px
+  const sw    = 20;                   // scroll width (rightward bulge)
+  const jh    = H2 * 0.18;           // scroll height ≈ 16px (top/bottom each)
+  const tipX  = brx - 22;            // tip points this far left
 
   // Thick vertical bar
   el('line', {x1:staffX1-2, y1:by1, x2:staffX1-2, y2:by2,
     stroke:'var(--text)', 'stroke-width':'2.5'});
 
-  // Musical curly brace — 4-segment cubic bezier:
-  //  1) Top terminal: hooks outward (right then back) to form the scroll
-  //  2) Upper arc:    S-curve from scroll shoulder down to the leftward tip
-  //  3) Lower arc:    mirror of upper, from tip back up to bottom shoulder
-  //  4) Bottom terminal: mirror of top scroll
+  // Musical curly brace — 4 cubic-bezier segments:
+  //
+  //  Seg 1 — top terminal: half-oval sweeping RIGHT then back to brx
+  //           C (brx+sw, by1)  (brx+sw, by1+jh)  (brx, by1+jh)
+  //
+  //  Seg 2 — upper body: tangent-matched at the junction (CP1 is the mirror of seg-1 CP2
+  //           across the junction, i.e. brx - sw), then curves left to the tip
+  //           C (brx-sw, by1+jh)  (tipX, mid-12)  (tipX, mid)
+  //
+  //  Seg 3 — lower body: mirror of seg 2
+  //  Seg 4 — bottom terminal: mirror of seg 1
   const brace = [
     `M ${brx},${by1}`,
-    `C ${brx+16},${by1+sh*0.3} ${brx+12},${by1+sh} ${brx},${by1+sh*2.2}`,
-    `C ${tipX+4},${by1+H2*0.55} ${tipX},${mid-8} ${tipX},${mid}`,
-    `C ${tipX},${mid+8} ${tipX+4},${by2-H2*0.55} ${brx},${by2-sh*2.2}`,
-    `C ${brx+12},${by2-sh} ${brx+16},${by2-sh*0.3} ${brx},${by2}`
+    `C ${brx+sw},${by1}       ${brx+sw},${by1+jh}    ${brx},${by1+jh}`,
+    `C ${brx-sw},${by1+jh}    ${tipX},${mid-12}       ${tipX},${mid}`,
+    `C ${tipX},${mid+12}       ${brx-sw},${by2-jh}    ${brx},${by2-jh}`,
+    `C ${brx+sw},${by2-jh}    ${brx+sw},${by2}        ${brx},${by2}`
   ].join(' ');
   el('path', {d:brace, fill:'none', stroke:'var(--text)',
     'stroke-width':'2.3', 'stroke-linecap':'round', 'stroke-linejoin':'round'});
