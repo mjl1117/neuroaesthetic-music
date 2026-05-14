@@ -25,6 +25,31 @@
     .q-card-features { font-size:.8rem;color:var(--text-2);line-height:1.6; }
     .model-row { margin-top:2rem; }
     .model-row p { font-size:.9rem; }
+
+    /* Definitions + data sections */
+    .full-section { max-width:1100px;margin:0 auto;padding:0 2rem 3rem;border-top:1px solid var(--border); }
+    .def-grid { display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin:1.5rem 0 2.5rem; }
+    @media(max-width:680px){ .def-grid{grid-template-columns:1fr;} }
+    .def-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem; }
+    .def-card h4 { font-size:1rem;font-weight:700;margin-bottom:.5rem; }
+    .def-card p  { font-size:.865rem;color:var(--text-2);line-height:1.7;margin:0 0 .6rem; }
+    .def-card p:last-child { margin-bottom:0; }
+    .def-card .formula { font-family:monospace;font-size:.82rem;background:var(--bg);padding:.35rem .65rem;border-radius:6px;display:inline-block;margin:.35rem 0; }
+
+    .data-table { width:100%;border-collapse:collapse;font-size:.85rem;margin:1.25rem 0; }
+    .data-table th { text-align:left;padding:.5rem .75rem;font-weight:600;font-size:.78rem;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border); }
+    .data-table td { padding:.55rem .75rem;border-bottom:1px solid var(--border);color:var(--text); }
+    .data-table tr:last-child td { border-bottom:none; }
+    .data-table tr:hover td { background:var(--bg); }
+    .badge-sm { font-size:.72rem;font-weight:600;padding:.2rem .55rem;border-radius:999px;white-space:nowrap; }
+    .badge-audio { background:#ede9fe;color:#5b21b6; }
+    .badge-bio   { background:#dcfce7;color:#166534; }
+    .badge-target{ background:#fef3c7;color:#92400e; }
+
+    .stat-row { display:flex;gap:2rem;flex-wrap:wrap;margin:1.25rem 0; }
+    .stat-box { background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.4rem;min-width:140px; }
+    .stat-num { font-size:1.8rem;font-weight:700;color:var(--indigo);line-height:1; }
+    .stat-lbl { font-size:.75rem;color:var(--text-2);margin-top:.3rem; }
     .legend { display:flex;gap:1.25rem;flex-wrap:wrap;margin:1.25rem 0 .5rem;align-items:center; }
     .legend-item { display:flex;align-items:center;gap:.5rem;font-size:.82rem;font-weight:500;color:var(--text-2); }
     .legend-dot { width:12px;height:12px;border-radius:50%;flex-shrink:0; }
@@ -117,10 +142,149 @@
   </div>
 </div>
 
+<!-- ── Definitions ───────────────────────────────────────────────────────── -->
+<div class="full-section" style="padding-top:2.5rem;">
+  <h2 style="margin-bottom:.4rem;">Defining Valence and Arousal</h2>
+  <p style="color:var(--text-2);font-size:.95rem;max-width:740px;">
+    The two-dimensional model of affect formalized by Russell (1980) provides the theoretical
+    backbone of this research. Each piece of music is located in the plane defined by these
+    two orthogonal axes.
+  </p>
+
+  <div class="def-grid">
+    <div class="def-card">
+      <h4 style="color:#7c3aed;">Valence</h4>
+      <p>Valence is the <strong>hedonic quality</strong> of an emotional experience, the degree to
+      which a stimulus is perceived as pleasant or unpleasant. It is the primary axis of the
+      circumplex model, spanning from highly negative affect (aversive, dysphoric) at one extreme
+      to highly positive affect (appetitive, euphoric) at the other.</p>
+      <p>In the Affective Circumplex (Russell, 1980; Barrett &amp; Russell, 1999), valence is
+      operationally independent of arousal: a piece can be simultaneously high-arousal and
+      negative-valence (tense, anxious) or high-arousal and positive-valence (excited, joyful).</p>
+      <p><strong>In this study:</strong> Participants rated valence on a continuous 0–100 slider
+      labeled "unpleasant" to "pleasant" following each 60-second excerpt. The scale was
+      anchored at 0 (maximally aversive), 50 (emotionally neutral), and 100 (maximally pleasant).</p>
+      <div class="formula">V ∈ [0, 100] → normalized to [−1, +1] by (V/50) − 1</div>
+    </div>
+    <div class="def-card">
+      <h4 style="color:#0284c7;">Arousal</h4>
+      <p>Arousal is the <strong>activation or energy dimension</strong> of emotion, capturing how
+      wakeful, energized, or activated an experience feels regardless of whether it is pleasant.
+      High-arousal states include excitement, anxiety, and agitation; low-arousal states include
+      calm, sadness, and serenity.</p>
+      <p>Arousal is physiologically grounded: it correlates directly with sympathetic nervous
+      system activity, including elevated heart rate, reduced heart rate variability, increased
+      electrodermal response (skin conductance), and faster respiration. This makes arousal
+      the more physiologically accessible of the two dimensions, and explains why biosignals
+      improved model performance substantially over audio features alone.</p>
+      <p><strong>In this study:</strong> Participants rated arousal on a continuous 0–100 slider
+      labeled "calm" to "activated" following each 60-second excerpt.</p>
+      <div class="formula">A ∈ [0, 100] → normalized to [−1, +1] by (A/50) − 1</div>
+    </div>
+  </div>
+
+  <div class="def-card" style="margin-bottom:2.5rem;">
+    <h4>Russell's Circumplex Model of Affect (1980)</h4>
+    <p>Russell proposed that all emotional experiences, including those evoked by music, can be
+    located in a two-dimensional continuous space defined by valence and arousal. Categorical
+    emotion labels (happy, sad, tense, calm) are regions within this space rather than
+    discrete categories. This model is now the dominant framework in music emotion research
+    (Eerola &amp; Vuoskoski, 2011; Thayer, 1986) because it accommodates the gradual, ambiguous,
+    and multi-dimensional character of musical affect, particularly in post-tonal and
+    spectralist repertoire where harmonic function is suspended.</p>
+    <p>The four quadrant labels used throughout this site reflect the dominant emotional
+    character of each region: <strong>Excited / Joyful</strong> (+V, +A), <strong>Tense / Anxious</strong>
+    (−V, +A), <strong>Calm / Serene</strong> (+V, −A), and <strong>Sad / Gloomy</strong> (−V, −A).
+    Contemporary classical music often occupies ambiguous inter-quadrant positions, which is a
+    key motivation for a continuous rather than categorical measurement model.</p>
+    <p style="font-size:.82rem;color:var(--muted);margin-top:.75rem;">
+      References: Russell, J. A. (1980). A circumplex model of affect. <em>Journal of Personality and
+      Social Psychology, 39</em>(6), 1161–1178. Barrett, L. F., &amp; Russell, J. A. (1999). The structure
+      of current affect. <em>Current Directions in Psychological Science, 8</em>(1), 10–14.
+    </p>
+  </div>
+</div>
+
+<!-- ── Dataset + Methods ────────────────────────────────────────────────── -->
+<div class="full-section">
+  <h2 style="margin-bottom:.4rem;">Dataset and Methods</h2>
+  <p style="color:var(--text-2);font-size:.95rem;max-width:740px;">
+    All model training, evaluation, and the circumplex coordinates above derive from a controlled
+    listening study with simultaneous biosignal capture.
+  </p>
+
+  <div class="stat-row">
+    <div class="stat-box"><div class="stat-num">2,773</div><div class="stat-lbl">Labeled windows (5 s each)</div></div>
+    <div class="stat-box"><div class="stat-num">100+</div><div class="stat-lbl">Music clips analyzed</div></div>
+    <div class="stat-box"><div class="stat-num">68</div><div class="stat-lbl">Features per window</div></div>
+    <div class="stat-box"><div class="stat-num">10 Hz</div><div class="stat-lbl">Feature extraction rate</div></div>
+    <div class="stat-box"><div class="stat-num">0.945</div><div class="stat-lbl">Valence R²</div></div>
+    <div class="stat-box"><div class="stat-num">0.944</div><div class="stat-lbl">Arousal R²</div></div>
+  </div>
+
+  <h3 style="margin:2rem 0 .75rem;">Study Protocol</h3>
+  <div class="def-card" style="margin-bottom:1.75rem;">
+    <p>Participants listened to each 60-second excerpt while wearing a
+    <strong>Bitalino biosignal device</strong> capturing four simultaneous physiological streams:
+    electrodermal activity (EDA), photoplethysmography (PPG), electrocardiography (ECG),
+    and 3-axis accelerometer. Signals were sampled at 1000 Hz and downsampled to 10 Hz
+    for windowed feature extraction.</p>
+    <p>Following each clip, participants rated both valence and arousal on continuous 0–100
+    sliders without time pressure. Windows were extracted by segmenting each clip into
+    overlapping 5-second frames with a 0.1-second stride. Each window received the
+    participant's post-clip ratings as its target labels, aligning self-report with
+    the contemporaneous physiological signal captured during listening.</p>
+  </div>
+
+  <h3 style="margin:1.75rem 0 .75rem;">Feature Schema — 68 Features per Window</h3>
+  <table class="data-table">
+    <thead>
+      <tr><th>Feature group</th><th>Statistics</th><th>Count</th><th>Type</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>RMS Energy</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-audio">Audio</span></td></tr>
+      <tr><td>Spectral Centroid (Hz)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-audio">Audio</span></td></tr>
+      <tr><td>Spectral Rolloff (Hz)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-audio">Audio</span></td></tr>
+      <tr><td>Spectral Bandwidth (Hz)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-audio">Audio</span></td></tr>
+      <tr><td>Spectral Flatness</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-audio">Audio</span></td></tr>
+      <tr><td>Zero-Crossing Rate</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-audio">Audio</span></td></tr>
+      <tr><td>EDA Tonic (skin conductance level)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+      <tr><td>EDA Phasic (galvanic skin response amplitude)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+      <tr><td>EDA SCR Rate (responses per minute)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+      <tr><td>Respiration Rate (breaths/min)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+      <tr><td>Respiration Amplitude</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+      <tr><td>Respiration Depth</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+      <tr><td>ECG Heart Rate (bpm)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+      <tr><td>ECG HR Trend</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+      <tr><td>ECG RMSSD (HRV index)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+      <tr><td>PPG Heart Rate (bpm)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+      <tr><td>PPG HRV (pulse-derived variability)</td><td>mean, std, min, max</td><td>4</td><td><span class="badge-sm badge-bio">Biosignal</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin:2rem 0 .75rem;">Model and Key Finding</h3>
+  <div class="def-card">
+    <p><strong>Algorithm:</strong> Random Forest Regressor (100 trees). Features were median-imputed
+    for missing biosignal windows and z-score standardized before training. Separate models
+    were trained for valence and arousal.</p>
+    <p><strong>Performance:</strong> In-sample R² on 2,773 windows: valence = 0.945, arousal = 0.944.
+    The circumplex scatter plot above compares participant-reported ratings (filled dots) against
+    Random Forest predictions (outline dots) for the 10 contemporary pieces, with dashed connecting
+    lines showing per-piece agreement. Shorter lines indicate tighter model-to-human alignment.</p>
+    <p><strong>Key finding:</strong> When feature importances were ranked by mean decrease in
+    impurity, the top-5 predictors for both valence and arousal were exclusively
+    <em>spectral</em> audio features (spectral centroid, rolloff, bandwidth, flatness, and RMS energy),
+    not harmonic or melodic features. This computationally corroborates the spectralist hypothesis
+    articulated by Grisey, Murail, and Saariaho: that timbre is the primary carrier of emotional
+    information in contemporary music, and that harmony, the organizing principle of tonal music,
+    is insufficient to account for emotional response in post-tonal repertoire.</p>
+  </div>
+</div>
+
 <script>
 // x = 250 + v*195,  y = 250 - a*195
-// Reported: human-perceived V/A from the listening study
-// Predicted: model-predicted V/A (R²=0.937 valence, R²=0.939 arousal)
+// rep = participant-reported V/A from the listening study (feat_df.parquet, normalised 0-100 → -1..1)
+// pred = Random Forest in-sample prediction (R²=0.945 valence / R²=0.944 arousal, 68 features)
 // rep = participant-reported V/A from the listening study (feat_df.parquet, normalised 0-100 → -1..1)
 // pred = Random Forest model prediction (R²=0.945 valence, R²=0.944 arousal, in-sample, 68 features)
 const PIECES = [
