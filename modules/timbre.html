@@ -432,7 +432,7 @@ function noteY(name, octave) {
 const BASS_LINES   = [340, 324, 308, 292, 276];
 // Treble clef lines: E4 G4 B4 D5 F5
 const TREBLE_LINES = [244, 228, 212, 196, 180];
-const LEFT_MARGIN = 130;
+const LEFT_MARGIN = 145;
 const COL_W = 70;  // horizontal spacing per partial
 const N_PARTIALS = 16;
 
@@ -469,14 +469,15 @@ function buildStaff(fundamentalKey) {
 
   // Clef symbols — standard Unicode Musical Symbols (U+1D11E treble, U+1D122 bass).
   // These are present in Apple Symbols (macOS), Segoe UI Symbol (Windows), and Bravura.
-  // y = SVG baseline. Apple Symbols font metrics (empirically tuned, ratio ~0.333):
-  //   Treble (font-size=100): G-curl ~33px above baseline → baseline = G4(228)+33 = 261
-  //   Bass   (font-size=55):  F-dots ~26px above baseline → baseline = F3(292)+26 = 318
+  // y = SVG baseline. Apple Symbols font metrics (empirically tuned):
+  //   Treble (font-size=130): y=248 — shifts glyph up so bottom scroll clears the
+  //     bass clef area; G-curl lands near G4 (2nd treble staff line, y=228).
+  //   Bass   (font-size=72):  F-dots ~34px above baseline → baseline = F3(292)+34 = 326
   // 𝄞 = U+1D11E treble clef
-  txt('𝄞', {x:staffX1+4, y:261, 'font-size':'100',
+  txt('𝄞', {x:staffX1+4, y:248, 'font-size':'130',
     'font-family':'Bravura,Apple Symbols,serif', fill:'var(--text)'});
   // 𝄢 = U+1D122 bass clef
-  txt('𝄢', {x:staffX1+4, y:318, 'font-size':'55',
+  txt('𝄢', {x:staffX1+4, y:326, 'font-size':'72',
     'font-family':'Bravura,Apple Symbols,serif', fill:'var(--text)'});
 
   // Grand staff: thick bracket bar + piano curly brace
@@ -490,13 +491,13 @@ function buildStaff(fundamentalKey) {
   el('line', {x1:staffX1-2, y1:by1, x2:staffX1-2, y2:by2,
     stroke:'var(--text)', 'stroke-width':'2.5'});
 
-  // Curly brace: two symmetric cubic beziers meeting at the midpoint tip.
-  // Control points at brx+10 create a gentle outward flare at both terminals;
-  // tipX control points steer smoothly into the leftward tip.
+  // Curly brace: two symmetric cubic beziers meeting at a sharp midpoint tip.
+  // brx+10 at ±35 from the ends flares the terminals outward;
+  // tipX at ±10 from the midpoint makes the centre come to a definite point.
   const brace = [
     `M ${brx},${by1}`,
-    `C ${brx+10},${by1+35} ${tipX},${mid-35} ${tipX},${mid}`,
-    `C ${tipX},${mid+35} ${brx+10},${by2-35} ${brx},${by2}`
+    `C ${brx+10},${by1+35} ${tipX},${mid-10} ${tipX},${mid}`,
+    `C ${tipX},${mid+10} ${brx+10},${by2-35} ${brx},${by2}`
   ].join(' ');
   el('path', {d:brace, fill:'none', stroke:'var(--text)',
     'stroke-width':'2.2', 'stroke-linecap':'round', 'stroke-linejoin':'round'});
