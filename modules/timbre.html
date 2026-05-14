@@ -163,12 +163,23 @@
 <!-- Spectralism Sandbox -->
 <div class="sandbox-section">
   <h2 style="margin-bottom:.5rem;">Spectralism Sandbox</h2>
-  <p style="color:var(--text-2);margin-bottom:1rem;">
-    Choose a fundamental pitch. The harmonic series is computed as integer multiples of that frequency —
-    each partial corresponds to a fraction <em>1/n</em> of the sounding string length. Click any notehead to
-    hear that partial. Partials 7, 11, 13, and 14 are marked out of equal temperament (&#9834; ET) because their
-    just-intonation ratios deviate &gt;14 cents from the nearest 12-TET pitch.
+  <p style="color:var(--text-2);margin-bottom:.75rem;">
+    A vibrating string naturally divides into exact fractions of itself — a half, a third, a quarter, and so on.
+    Each division vibrates at an integer multiple of the fundamental frequency and produces a distinct pitch
+    called a <strong>partial</strong> (or harmonic). The diagram below shows what this looks like physically:
+    the gray dots are <em>nodes</em>, points on the string that stay perfectly still while everything else vibrates.
   </p>
+  <p style="color:var(--text-2);margin-bottom:.75rem;">
+    Some of these partials land between the keys of a standard piano. A piano divides the octave into
+    12 equal steps (equal temperament), but the harmonic series follows the physics of vibrating strings —
+    not a 12-step grid. <strong>Partials 7, 11, 13, and 14</strong> (highlighted in orange below) produce
+    pitches that sit in the cracks between piano keys. To play them on a piano you would have to use the
+    nearest key, which is noticeably out of tune with the pure harmonic. Spectral composers like Grisey
+    treated these "off-key" partials as deliberate timbral colors rather than approximating them into
+    familiar chords.
+  </p>
+
+  <div id="vibStringWrap" style="margin:1rem 0 1.75rem;"></div>
 
   <div class="sandbox-controls">
     <label for="fundSelect">Fundamental:</label>
@@ -196,9 +207,9 @@
   </div>
 
   <div class="sandbox-legend">
-    <span class="out-of-et">&#9679; Orange fill</span> = out of equal temperament (&gt;14 cents deviation) &nbsp;|&nbsp;
-    Click a notehead to hear that partial &nbsp;|&nbsp;
-    Fractions show the string-length ratio: <em>1/n</em> produces the <em>n</em>th harmonic
+    <span class="out-of-et">&#9679; Orange notes</span> fall between piano keys and cannot be played in tune on a standard instrument &nbsp;|&nbsp;
+    Click any notehead to hear that partial &nbsp;|&nbsp;
+    <em>1/n</em> = the fraction of the string that vibrates to produce the <em>n</em>th partial
   </div>
 </div>
 
@@ -265,6 +276,98 @@ FEATURES.forEach(f => {
       <div class="feature-val">${(f.importance*100).toFixed(1)}%</div>
     </div>`;
 });
+</script>
+
+<script>
+// ── Vibrating String Modes Diagram ────────────────────────────────────────
+// Recreates the classical "string harmonics" illustration: each row shows
+// the standing-wave shape for mode n (fundamental + first 6 harmonics).
+// The two mirrored sine envelopes bound the string's maximum displacement.
+// Gray dots mark the nodes (points of zero motion) at positions k/n.
+(function () {
+  const ns = 'http://www.w3.org/2000/svg';
+  const N = 7;          // fundamental + 6 harmonics
+  const SPAN = 400;     // horizontal string length in px
+  const LEFT = 58;      // left margin (for fraction labels)
+  const TOP  = 18;      // top padding
+  const ROW  = 54;      // height per mode row
+  const AMP  = 15;      // max displacement (half-amplitude)
+  const STEPS = 300;    // path resolution
+  const W = LEFT + SPAN + 16;
+  const H = TOP + N * ROW + 14;
+
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('style', 'max-width:540px;display:block;border-radius:10px;border:1px solid var(--border);background:var(--surface);');
+
+  function el(tag, attrs, parent) {
+    const e = document.createElementNS(ns, tag);
+    Object.entries(attrs).forEach(([k,v]) => e.setAttribute(k,v));
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  function txt(content, attrs, parent) {
+    const t = el('text', attrs, parent);
+    t.textContent = content;
+    return t;
+  }
+
+  // "0" and "1" endpoint labels at top
+  txt('0', { x: LEFT, y: TOP - 4, 'font-size': '11', fill: 'var(--text-2)', 'text-anchor': 'middle' });
+  txt('1', { x: LEFT + SPAN, y: TOP - 4, 'font-size': '11', fill: 'var(--text-2)', 'text-anchor': 'middle' });
+
+  for (let n = 1; n <= N; n++) {
+    const cy = TOP + (n - 0.5) * ROW;
+
+    // Faint center line
+    el('line', { x1: LEFT, y1: cy, x2: LEFT + SPAN, y2: cy,
+      stroke: '#e2e7f0', 'stroke-width': '1' });
+
+    // Upper + lower envelope as a single closed path (creates lens-shaped lobes)
+    let d = '';
+    for (let i = 0; i <= STEPS; i++) {
+      const t = i / STEPS;
+      const sx = (LEFT + t * SPAN).toFixed(1);
+      const sy = (cy - AMP * Math.sin(n * Math.PI * t)).toFixed(1);
+      d += (i === 0 ? 'M' : 'L') + sx + ',' + sy + ' ';
+    }
+    // trace back along lower envelope
+    for (let i = STEPS; i >= 0; i--) {
+      const t = i / STEPS;
+      const sx = (LEFT + t * SPAN).toFixed(1);
+      const sy = (cy + AMP * Math.sin(n * Math.PI * t)).toFixed(1);
+      d += 'L' + sx + ',' + sy + ' ';
+    }
+    d += 'Z';
+    el('path', { d, fill: 'none', stroke: '#1e293b', 'stroke-width': '1.5',
+      'stroke-linejoin': 'round' });
+
+    // Endpoint anchor dots
+    [0, 1].forEach(t => {
+      el('circle', { cx: LEFT + t * SPAN, cy, r: '3', fill: '#1e293b' });
+    });
+
+    // Node dots (gray) at k/n for k=1..n-1, label the first one with 1/n
+    for (let k = 1; k < n; k++) {
+      const nx = (LEFT + (k / n) * SPAN).toFixed(1);
+      el('circle', { cx: nx, cy, r: '4', fill: '#94a3b8' });
+    }
+
+    // Fraction label at left (1/n for n>1; blank for fundamental)
+    const label = n === 1 ? '' : `1/${n}`;
+    if (label) {
+      // position label at first node x, above center line
+      const firstNodeX = LEFT + (1 / n) * SPAN;
+      txt(label, {
+        x: firstNodeX, y: cy - AMP - 5,
+        'font-size': '10.5', fill: 'var(--text-2)',
+        'text-anchor': 'middle', 'font-family': 'Inter,sans-serif'
+      });
+    }
+  }
+
+  document.getElementById('vibStringWrap').appendChild(svg);
+})();
 </script>
 
 <script>
@@ -351,10 +454,20 @@ function buildStaff(fundamentalKey) {
       stroke:'var(--border)', 'stroke-width':'1.5'});
   });
 
-  // Ledger line gap indicator between staves (middle C zone)
-  // Brace / clef symbols (simple text glyphs)
-  txt('𝄢', {x:staffX1+2, y:BASS_LINES[0]+6, 'font-size':'38', fill:'var(--text-2)'});   // bass clef
-  txt('𝄞', {x:staffX1+2, y:TREBLE_LINES[4]-14, 'font-size':'52', fill:'var(--text-2)'}); // treble clef
+  // Clef symbols.
+  // Bass clef 𝄢: the two dots must bracket the F line (4th from bottom = BASS_LINES[1]=292).
+  //   In most system fonts the visual midpoint of 𝄢 sits ~55% up from the baseline,
+  //   so shift the baseline down by that fraction of the character height (font-size 30 ≈ 30px).
+  //   baseline = F_line + 0.45 * 30 ≈ 306
+  txt('𝄢', {x:staffX1+4, y:BASS_LINES[1]+14, 'font-size':'30', fill:'var(--text-2)',
+    'dominant-baseline':'auto'});
+
+  // Treble clef 𝄞: the curl must wrap the G line (2nd from bottom = TREBLE_LINES[1]=228).
+  //   𝄞 is very tall; in most system fonts the G-curl sits ~70% up from the baseline.
+  //   font-size 46, character height ≈ 138px → G-line offset = 0.70*138 = 97
+  //   baseline = G_line + 97 = 325. The clef then spans ~228-41=187 to 325, covering the staff.
+  txt('𝄞', {x:staffX1+4, y:TREBLE_LINES[1]+97, 'font-size':'46', fill:'var(--text-2)',
+    'dominant-baseline':'auto'});
 
   // Grand staff bracket
   el('line', {x1:staffX1-2,y1:TREBLE_LINES[4]-8,x2:staffX1-2,y2:BASS_LINES[0]+6,
@@ -405,6 +518,18 @@ function buildStaff(fundamentalKey) {
       tabindex:'0',
       'aria-label': `Partial ${n}: ${name}${octave} ${freq.toFixed(0)} Hz`
     });
+
+    // Accidental to the left of the notehead (♯ or ♭ when the pitch has one)
+    const accSym = name.includes('♯') ? '♯' : name.includes('♭') ? '♭' : null;
+    if (accSym) {
+      txt(accSym, {
+        x: x - 11, y: cy + 4,
+        'font-size': '11',
+        fill: isOOT ? '#f59e0b' : 'var(--indigo)',
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle'
+      }, g);
+    }
 
     // Notehead
     el('ellipse', {
