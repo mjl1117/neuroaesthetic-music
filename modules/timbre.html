@@ -97,12 +97,16 @@
     }
     .out-of-et { color:#f59e0b;font-weight:600; }
 
-    /* Bravura — SMuFL standard music font.
-       Each glyph has its anchor at its defining pitch line (G for treble, F for bass),
-       so setting SVG text y = that line's pixel position gives exact placement. */
+    /* Bravura — open-source SMuFL music font.
+       When loaded, its Unicode Musical Symbol glyphs (U+1D11E treble, U+1D122 bass)
+       are anchored at the bottom of the respective staff, giving clean macOS-style rendering.
+       Multiple CDN sources are listed so at least one resolves. If none load the browser
+       falls back to Apple Symbols / system serif, which also contains these code points. */
     @font-face {
       font-family: 'Bravura';
-      src: url('https://cdn.jsdelivr.net/gh/steinbergmedia/bravura/redist/woff2/Bravura.woff2') format('woff2');
+      src: url('https://cdn.jsdelivr.net/gh/steinbergmedia/bravura@main/redist/woff2/Bravura.woff2') format('woff2'),
+           url('https://cdn.jsdelivr.net/gh/steinbergmedia/bravura@master/redist/woff2/Bravura.woff2') format('woff2'),
+           url('https://cdn.jsdelivr.net/gh/steinbergmedia/bravura/redist/woff2/Bravura.woff2') format('woff2');
       font-display: swap;
     }
   </style>
@@ -463,16 +467,16 @@ function buildStaff(fundamentalKey) {
       stroke:'var(--border)', 'stroke-width':'1.5'});
   });
 
-  // Clef symbols — rendered with Bravura (SMuFL standard music font).
-  // In SMuFL, 1em = 4 staff spaces = 4 × 16px = 64px in this layout.
-  // SMuFL anchor points: gClef (U+E050) origin = G line; fClef (U+E062) origin = F line.
-  // Setting y to those exact pixel positions gives perfect placement.
-  // TREBLE_LINES[1] = 228 = G4 (2nd line from bottom of treble staff).
-  // BASS_LINES[1]   = 292 = F3 (4th line from bottom of bass staff).
-  txt('', {x:staffX1+6, y:TREBLE_LINES[1], 'font-size':'64',
-    'font-family':'Bravura,serif', fill:'var(--text)', 'dominant-baseline':'auto'});
-  txt('', {x:staffX1+6, y:BASS_LINES[1], 'font-size':'64',
-    'font-family':'Bravura,serif', fill:'var(--text)', 'dominant-baseline':'auto'});
+  // Clef symbols — standard Unicode Musical Symbols (U+1D11E treble, U+1D122 bass).
+  // These are present in Apple Symbols (macOS), Segoe UI Symbol (Windows), and Bravura.
+  // y positions tuned for Apple Symbols on macOS: baseline just below E4 (treble, y=252)
+  // and just below D3 (bass, y=322) so the G-curl and F-dots land on the correct lines.
+  // 𝄞 = U+1D11E treble clef (standard Unicode, present in Apple Symbols + Bravura)
+  txt('𝄞', {x:staffX1+6, y:252, 'font-size':'48',
+    'font-family':'Bravura,Apple Symbols,serif', fill:'var(--text)'});
+  // 𝄢 = U+1D122 bass clef
+  txt('𝄢', {x:staffX1+6, y:322, 'font-size':'30',
+    'font-family':'Bravura,Apple Symbols,serif', fill:'var(--text)'});
 
   // Grand staff bracket
   el('line', {x1:staffX1-2,y1:TREBLE_LINES[4]-8,x2:staffX1-2,y2:BASS_LINES[0]+6,
