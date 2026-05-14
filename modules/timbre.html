@@ -478,33 +478,47 @@ function buildStaff(fundamentalKey) {
   const by1 = TREBLE_LINES[4] - 8;   // top of system  (y=172)
   const by2 = BASS_LINES[0]  + 6;    // bottom of system (y=346)
   const mid = (by1 + by2) / 2;       // midpoint       (y=259)
-  const brx  = staffX1 - 14;  // right edge of brace
-  const sw   = 18;             // scroll rightward bulge
-  const jh   = 16;             // scroll height (top/bottom each)
-  const tipX = brx - 22;      // tip extends this far left
+  const brx  = staffX1 - 14;  // right reference edge
+  const sw   = 16;             // scroll rightward bulge width
+  const sh   = 6;              // scroll half-width at junction
+  const tipX = brx - 20;      // centre tip x (leftmost extent)
+  const jYt  = by1 + 28;      // y where top scroll meets body
+  const jYb  = by2 - 28;      // y where bottom scroll meets body
 
   // Thick vertical bar
   el('line', {x1:staffX1-2, y1:by1, x2:staffX1-2, y2:by2,
     stroke:'var(--text)', 'stroke-width':'2.5'});
 
-  // Musical curly brace: 4 separate path elements with different stroke-widths
-  // to replicate the calligraphic variable width (thin scrolls, thick body).
+  // Filled closed-outline brace — the only way to get genuine calligraphic
+  // variable width (near-zero at terminal tips, thick in the body arcs).
   //
-  //  Seg 1/4 — terminal scrolls: half-oval sweeping right then back. thin (1.5px)
-  //  Seg 2/3 — body arcs: C1-continuous at the junction, sweep left to tip. thick (3.4px)
-  const braceParts = [
-    // top scroll (thin)
-    [`M ${brx},${by1} C ${brx+sw},${by1} ${brx+sw},${by1+jh} ${brx},${by1+jh}`, '1.5'],
-    // upper body (thick)
-    [`M ${brx},${by1+jh} C ${brx-sw},${by1+jh} ${tipX},${mid-12} ${tipX},${mid}`, '3.4'],
-    // lower body (thick)
-    [`M ${tipX},${mid} C ${tipX},${mid+12} ${brx-sw},${by2-jh} ${brx},${by2-jh}`, '3.4'],
-    // bottom scroll (thin)
-    [`M ${brx},${by2-jh} C ${brx+sw},${by2-jh} ${brx+sw},${by2} ${brx},${by2}`, '1.5'],
-  ];
-  braceParts.forEach(([d, w]) =>
-    el('path', {d, fill:'none', stroke:'var(--text)',
-      'stroke-width':w, 'stroke-linecap':'round'}));
+  // Path traces CLOCKWISE from the top terminal tip:
+  //   outer edge → top scroll → upper body → lower body → bottom scroll
+  //   then back UP the inner edge (completing the filled outline).
+  //
+  // C1-continuity at every junction: each segment's first CP is the mirror
+  // of the previous segment's last CP across the shared endpoint, so there
+  // are no visible kinks except at the centre tip (where a cusp is desired).
+  //
+  // Effective widths:
+  //   scroll peak ≈ 4 px (thin teardrop)
+  //   body junction ≈ 12 px
+  //   body midpoint ≈ 5 px  (tapers to 0 at tip)
+  const braceD = [
+    `M ${brx},${by1}`,
+    // outer edge ↓
+    `C ${brx+sw},${by1}          ${brx+sw},${jYt}          ${brx+sh},${jYt}`,
+    `C ${brx-sw+sh},${jYt}       ${tipX+sh*.5},${mid-10}   ${tipX},${mid}`,
+    `C ${tipX+sh*.5},${mid+10}   ${brx-sw+sh},${jYb}       ${brx+sh},${jYb}`,
+    `C ${brx+sw},${jYb}          ${brx+sw},${by2}          ${brx},${by2}`,
+    // inner edge ↑
+    `C ${brx+sw-4},${by2}        ${brx+sw-4},${jYb}        ${brx-sh},${jYb}`,
+    `C ${brx-sw-sh*.5},${jYb}    ${tipX-sh*.5},${mid+10}   ${tipX},${mid}`,
+    `C ${tipX-sh*.5},${mid-10}   ${brx-sw-sh*.5},${jYt}    ${brx-sh},${jYt}`,
+    `C ${brx+sw-4},${jYt}        ${brx+sw-4},${by1}        ${brx},${by1}`,
+    'Z'
+  ].join(' ');
+  el('path', {d:braceD, fill:'var(--text)', stroke:'none'});
 
   const fundHz = FUND_HZ[fundamentalKey];
 
